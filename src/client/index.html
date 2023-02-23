@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="./normalize.css" rel="stylesheet">
+	<link href="./style.css" rel="stylesheet">
+	<title>WebRTC Live</title>
+</head>
+
+<body>
+	<div id="root">
+		<aside id="aside">
+			<h4>Capture Video Input Devices</h4>
+			<ul id="video-input-list">
+			</ul>
+			<h4>Capture Audio Input Devices</h4>
+			<ul id="audio-input-list">
+			</ul>
+			<h4>Capture Audio Output Devices</h4>
+			<ul id="audio-output-list">
+			</ul>
+			<button id="capture-display-btn">capture display</button>
+		</aside>
+		<div id="canvas">
+			<video id="video" autoplay width="1280px" height="720px"></video>
+		</div>
+		<audio id="audio-stream-player" style="display: none;"></audio>
+	</div>
+</body>
+<script src="./global-variable.js"></script>
+<script src="./capture.js"></script>
+<script>
+	async function main() {
+		const hasPermission = await getPermission();
+		if (hasPermission) {
+			autoRefreshDevices();
+		}
+	}
+	main();
+</script>
+
+</html>

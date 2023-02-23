@@ -1,0 +1,15 @@
+{
+	"name": "webrtc_live",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"client:start": "serve src/client"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"serve": "^14.2.0"
+	}
+}
