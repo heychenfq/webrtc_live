@@ -1,8 +1,6 @@
 
 const mediaDevices = navigator.mediaDevices;
 window.audioStream = new MediaStream();
-audioStreamPlayerElement.srcObject = audioStream;
-audioStreamPlayerElement.autoplay = true;
 
 async function getPermission() {
 	try {
