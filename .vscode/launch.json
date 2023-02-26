@@ -10,7 +10,8 @@
 			"name": "Launch Program",
 			"skipFiles": ["<node_internals>/**"],
 			"program": "${workspaceFolder}/server.js",
-			"outFiles": ["${workspaceFolder}/**/*.js"]
+			"outFiles": ["${workspaceFolder}/**/*.js"],
+			"runtimeArgs": ["--preserve-symlinks"]
 		}
 	]
 }

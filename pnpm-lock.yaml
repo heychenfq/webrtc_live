@@ -1,12 +1,20 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@types/node': ^18.14.1
   ws: ^8.12.1
 
 dependencies:
   ws: 8.12.1
 
+devDependencies:
+  '@types/node': 18.14.1
+
 packages:
+
+  /@types/node/18.14.1:
+    resolution: {integrity: sha512-QH+37Qds3E0eDlReeboBxfHbX9omAcBCXEzswCu6jySP642jiM3cYSIkU/REqwhCUqXdonHFuBfJDiAJxMNhaQ==}
+    dev: true
 
   /ws/8.12.1:
     resolution: {integrity: sha512-1qo+M9Ba+xNhPB+YTWUlK6M17brTut5EXbcBaMRN5pH5dFrXz7lzz1ChFSUq3bOUl8yEvSenhHmYUNJxFzdJew==}

@@ -36,7 +36,9 @@
 	}
 
 	async function captureDisplay() {
-		const stream = await navigator.mediaDevices.getDisplayMedia();
+		const stream = await navigator.mediaDevices.getDisplayMedia({
+			audio: true,
+		});
 		renderEngine.addTrack(stream.getTracks()[0]);
 	}
 	globalThis.mediaCapture = {

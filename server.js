@@ -1,12 +1,18 @@
-import http from 'http';
+import https from 'https';
 import path from 'path';
 import fs from 'fs';
+import URL from 'url';
+import querystring from 'querystring';
 import { getIPAddress } from './util.js';
 import { setupWebSocketServer } from './websocket.js';
+import { randomUUID } from 'crypto';
 
-const server = http.createServer(handleRequest).listen(3001, () => {
+const server = https.createServer({
+	key: fs.readFileSync(path.resolve(process.env.HOME, '.ca/key.pem')),
+	cert: fs.readFileSync(path.resolve(process.env.HOME, '.ca/cert.pem')),
+}, handleRequest).listen(3000, () => {
 	const address = getIPAddress();
-	console.log('app started at: \n', `http://localhost:3001\n`, `http://${address}:3001\n`);
+	console.log(`app started. \nstream address: https://${address}:3000/stream.html\nlive address: https://${address}:3000/live.html`);
 });
 
 async function handleRequest(req, res) {
@@ -18,8 +24,19 @@ async function handleRequest(req, res) {
 }
 
 async function handleStaticResource(req, res) {
-	const queryStartIndex = req.url.indexOf('?');
-	let filepath = path.resolve(process.cwd(), 'static', req.url.slice(1, queryStartIndex === -1 ? undefined : queryStartIndex));
+	const url = URL.parse(req.url);
+	const params = querystring.parse(url.query);
+	if (url.pathname === '/stream.html' || url.pathname === '/live.html') {
+		if (!params.id) {
+			const id = randomUUID();
+			res.statusCode = 301;
+			console.log(req);
+			res.setHeader('location', `https://${req.headers['host']}${url.pathname}?id=${id}`);
+			res.end();
+			return true;
+		}
+	}
+	let filepath = path.resolve(process.cwd(), 'static', url.pathname.slice(1));
 	try {
 		let stats = await fs.promises.stat(filepath);
 		if (stats.isDirectory()) {
