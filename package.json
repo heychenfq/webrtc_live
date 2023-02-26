@@ -5,15 +5,12 @@
 	"private": true,
 	"description": "webrtc live demo",
 	"scripts": {
-		"start": "node src/server/index.js"
+		"start": "node server.js"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "MIT",
 	"dependencies": {
-		"debug": "^4.3.4"
-	},
-	"devDependencies": {
-		"serve": "^14.2.0"
+		"ws": "^8.12.1"
 	}
 }
