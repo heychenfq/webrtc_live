@@ -1,88 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link href="./normalize.css" rel="stylesheet" />
+		<link href="./style.css" rel="stylesheet" />
+		<title>WebRTC Stream Live</title>
+	</head>
 
-<head>
-	<meta charset="UTF-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<link href="./normalize.css" rel="stylesheet" />
-	<link href="./style.css" rel="stylesheet" />
-	<title>WebRTC Stream Live</title>
-</head>
-
-<body>
-	<div id="root">
-		<header>
-			<form>
-				<label>
-					microphone:
-					<select id="audioinput" value=""></select>
-				</label>
-				<label>
-					camera:
-					<select id="videoinput" value=""></select>
-				</label>
-				<button id="capture-display-btn" type="button">capture display or window</button>
-			</form>
-		</header>
-		<aside id="tracks">
-		</aside>
-		<canvas id="canvas" width="1920" height="1080"></canvas>
-	</div>
-</body>
-<script src="./signal-channel.js"></script>
-<script src="./peer-connection.js"></script>
-<script src="./render.js"></script>
-<script src="./capture.js"></script>
-<script>
-	async function main() {
-		const hasPermission = await mediaCapture.requestPermission();
-		if (hasPermission) {
-			peerConnectionNS.waitingConnect();
-			const audioinputSelect = document.getElementById('audioinput');
-			const videoinputSelect = document.getElementById('videoinput');
-			const captureDisplayBtn = document.getElementById('capture-display-btn');
-			audioinputSelect.addEventListener('change', (event) => {
-				const deviceId = event.currentTarget.value;
-				if (deviceId) {
-					mediaCapture.captureDevice(deviceId, 'audioinput');
-					event.currentTarget.value = '';
-				}
-			});
-			videoinputSelect.addEventListener('change', (event) => {
-				const deviceId = event.currentTarget.value;
-				if (deviceId) {
-					mediaCapture.captureDevice(deviceId, 'videoinput');
-					event.currentTarget.value = '';
-				}
-			});
-			captureDisplayBtn.addEventListener('click', () => {
-				mediaCapture.captureDisplay();
-			});
-			async function autoRefreshDevices() {
-				audioinputSelect.innerHTML = '';
-				const defaultAudioInputOption = document.createElement('option');
-				defaultAudioInputOption.value = '';
-				defaultAudioInputOption.innerText = 'select one device';
-				audioinputSelect.appendChild(defaultAudioInputOption);
-				videoinputSelect.innerHTML = '';
-				const defaultAudioOutputOption = document.createElement('option');
-				defaultAudioOutputOption.value = '';
-				defaultAudioOutputOption.innerText = 'select one device';
-				videoinputSelect.appendChild(defaultAudioOutputOption);
-				const devices = await mediaCapture.enumerateDevices();
-				devices.forEach(device => {
-					const option = document.createElement('option');
-					option.innerText = device.label;
-					option.value = device.deviceId;
-					document.getElementById(device.kind).appendChild(option);
+	<body>
+		<div id="root">
+			<header>
+				<form>
+					<label>
+						microphone:
+						<select id="audioinput" value=""></select>
+					</label>
+					<label>
+						camera:
+						<select id="videoinput" value=""></select>
+					</label>
+					<button id="capture-display-btn" type="button">
+						capture display or window
+					</button>
+				</form>
+			</header>
+			<aside id="tracks"></aside>
+			<canvas id="canvas" width="1920" height="1080"></canvas>
+		</div>
+	</body>
+	<script src="./capture.js"></script>
+	<script src="./signal-channel.js"></script>
+	<script src="./peer-connection.js"></script>
+	<script src="./renderer.js"></script>
+	<script>
+		async function main() {
+			const hasPermission = await captureNS.requestPermission();
+			if (hasPermission) {
+				peerConnectionNS.waitingConnect();
+				const audioinputSelect = document.getElementById("audioinput");
+				const videoinputSelect = document.getElementById("videoinput");
+				const captureDisplayBtn = document.getElementById(
+					"capture-display-btn"
+				);
+				audioinputSelect.addEventListener("change", (event) => {
+					const deviceId = event.currentTarget.value;
+					if (deviceId) {
+						captureNS.captureDevice(deviceId, "audioinput");
+						event.currentTarget.value = "";
+					}
 				});
-				navigator.mediaDevices.addEventListener('devicechange', autoRefreshDevices);
+				videoinputSelect.addEventListener("change", (event) => {
+					const deviceId = event.currentTarget.value;
+					if (deviceId) {
+						captureNS.captureDevice(deviceId, "videoinput");
+						event.currentTarget.value = "";
+					}
+				});
+				captureDisplayBtn.addEventListener("click", () => {
+					captureNS.captureDisplay();
+				});
+				async function autoRefreshDevices() {
+					audioinputSelect.innerHTML = "";
+					const defaultAudioInputOption = document.createElement("option");
+					defaultAudioInputOption.value = "";
+					defaultAudioInputOption.innerText = "select one device";
+					audioinputSelect.appendChild(defaultAudioInputOption);
+					videoinputSelect.innerHTML = "";
+					const defaultAudioOutputOption = document.createElement("option");
+					defaultAudioOutputOption.value = "";
+					defaultAudioOutputOption.innerText = "select one device";
+					videoinputSelect.appendChild(defaultAudioOutputOption);
+					const devices = await captureNS.enumerateDevices();
+					devices.forEach((device) => {
+						const option = document.createElement("option");
+						option.innerText = device.label;
+						option.value = device.deviceId;
+						document.getElementById(device.kind).appendChild(option);
+					});
+					navigator.mediaDevices.addEventListener(
+						"devicechange",
+						autoRefreshDevices
+					);
+				}
+				autoRefreshDevices();
 			}
-			autoRefreshDevices();
 		}
-	}
-	main();
-</script>
-
+		main();
+	</script>
 </html>

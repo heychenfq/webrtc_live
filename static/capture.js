@@ -1,5 +1,3 @@
-
-
 (function () {
 	async function requestPermission() {
 		try {
@@ -31,7 +29,8 @@
 			},
 		});
 		mediaStream.getTracks().forEach((track) => {
-			renderEngine.addTrack(track);
+			const source = rendererNS.createSourceFromTrack({ track });
+			rendererNS.addSource(source);
 		});
 	}
 
@@ -39,9 +38,12 @@
 		const stream = await navigator.mediaDevices.getDisplayMedia({
 			audio: true,
 		});
-		renderEngine.addTrack(stream.getTracks()[0]);
+		stream.getTracks().forEach((track) => {
+			const source = rendererNS.createSourceFromTrack({ track });
+			rendererNS.addSource(source);
+		});
 	}
-	globalThis.mediaCapture = {
+	globalThis.captureNS = {
 		requestPermission,
 		enumerateDevices,
 		captureDevice,

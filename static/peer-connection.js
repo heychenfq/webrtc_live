@@ -1,13 +1,12 @@
 (function () {
 	const connections = new Map();
 
-	function createConnection(to, videoElement) {
+	function createConnection(to, onRemoveAddTrack) {
 		const peerConnection = new RTCPeerConnection();
 		const connection = {
 			id: to,
 			peerConnection,
 			dataChannel: null,
-			mediaStream: new MediaStream(),
 		};
 		connections.set(to, connection);
 		peerConnection.addEventListener('icecandidate', (event) => {
@@ -24,17 +23,14 @@
 		});
 		peerConnection.addEventListener('negotiationneeded', () => {
 			console.log('negotiationneeded');
-			createOffer(connection, to);
+			createOffer(connection, to, false);
 		});
 		peerConnection.addEventListener('datachannel', (event) => {
 			connection.dataChannel = event.channel;
 		});
 		peerConnection.addEventListener('track', (event) => {
 			const track = event.track;
-			if (track.kind === 'video') {
-				videoElement.srcObject = connection.mediaStream;
-			}
-			connection.mediaStream.addTrack(event.track);
+			onRemoveAddTrack?.(track);
 		});
 		peerConnection.addEventListener('connectionstatechange', () => {
 			console.log('peer connection state change, from: ', to, 'state: ', peerConnection.connectionState);
@@ -49,17 +45,11 @@
 		signalChannel.addEventListener('message', async ({ data }) => {
 			const from = data.from;
 			let connection = connections.get(from);
-			if (!connection) {
-				if (data.payload.type === 'offer') {
-					connection = createConnection(from);
-					connection.peerConnection.addTrack(renderEngine.videoTrack);
-					renderEngine.audioTracks.forEach(track => {
-						connection.peerConnection.addTrack(track);
-					});
-					createDataChannel(connection);
-				} else {
-					return;
-				}
+			if (data.payload.type === 'offer' && data.payload.first) {
+				connection = createConnection(from);
+				rendererNS.tracks.forEach(track => {
+					connection.peerConnection.addTrack(track);
+				});
 			}
 			if (data.payload.type === 'offer') {
 				await handleOffer(connection, data);
@@ -73,18 +63,17 @@
 		});
 	}
 
-	async function createDataChannel(connection) {
-		const peerConnection = connection.peerConnection;
-		connection.dataChannel = peerConnection.createDataChannel("");
-	}
-
-	async function createOffer(connection, to) {
+	async function createOffer(connection, to, first) {
 		const peerConnection = connection.peerConnection;
 		const offer = await peerConnection.createOffer();
 		await peerConnection.setLocalDescription(offer);
 		signalChannel.send({
 			to,
-			payload: offer,
+			payload: {
+				type: offer.type,
+				sdp: offer.sdp,
+				first,
+			},
 		});
 	}
 
@@ -113,9 +102,11 @@
 		}
 	}
 
-	async function connect(to, videoElement) {
+	async function connect(to, onRemoveAddTrack) {
 		addSignalChannelListener();
-		await createOffer(createConnection(to, videoElement), to);
+		const connection = createConnection(to, onRemoveAddTrack);
+		connection.dataChannel = connection.peerConnection.createDataChannel('dc');
+		await createOffer(connection, to, true);
 	}
 
 	async function waitingConnect() {

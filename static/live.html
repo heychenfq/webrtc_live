@@ -1,41 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>WebRTC Live Viewer</title>
+	</head>
 
-<head>
-	<meta charset="UTF-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>WebRTC Live Viewer</title>
-</head>
-
-<body>
-	<div id="root">
-		<main>
-			<form id="connect-form">
-				<label>
-					Host ID:
-					<input name="host-id" />
-				</label>
-				<button type="submit">view live</button>
-			</form>
-		</main>
-	</div>
-</body>
-<script src="./signal-channel.js"></script>
-<script src="./peer-connection.js"></script>
-<script>
-	document.getElementById('connect-form').addEventListener('submit', (event) => {
-		event.preventDefault();
-		const hostID = event.currentTarget['host-id'].value;
-		if (hostID) {
-			videoElement = document.createElement('video');
-			videoElement.controls = true;
-			const rootElement = document.getElementById('root');
-			rootElement.innerText = '';
-			rootElement.appendChild(videoElement);
-			peerConnectionNS.connect(hostID, videoElement);
-		}
-	});
-</script>
-
+	<body>
+		<div id="root">
+			<main>
+				<form id="connect-form">
+					<label>
+						Host ID:
+						<input name="host-id" />
+					</label>
+					<button type="submit">view live</button>
+				</form>
+			</main>
+		</div>
+	</body>
+	<script src="./signal-channel.js"></script>
+	<script src="./peer-connection.js"></script>
+	<script>
+		document
+			.getElementById("connect-form")
+			.addEventListener("submit", (event) => {
+				event.preventDefault();
+				const hostID = event.currentTarget["host-id"].value;
+				if (hostID) {
+					videoElement = document.createElement("video");
+					videoElement.controls = true;
+					videoElement.autoplay = true;
+					videoElement.srcObject = new MediaStream();
+					const rootElement = document.getElementById("root");
+					rootElement.innerText = "";
+					rootElement.appendChild(videoElement);
+					peerConnectionNS.connect(hostID, (track) => {
+						const mediaStream = videoElement.srcObject;
+						if (track.kind === "video") {
+							mediaStream.getVideoTracks().forEach((i) => {
+								mediaStream.removeTrack(i);
+							});
+							videoElement.style.width = "1280px";
+							videoElement.style.height = "720px";
+						}
+						mediaStream.addTrack(track);
+					});
+				}
+			});
+	</script>
 </html>
