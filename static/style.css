@@ -6,23 +6,50 @@ body {
 }
 
 #root {
+	width: 100%;
+	height: 100%;
 	display: grid;
+	gap: 8px;
+	grid-template-columns: 250px 1fr 250px;
+	grid-template-rows: 50px repeat(2, 1fr);
 }
 
-#header {
+#root > header {
 	border: 1px solid #eee;
+	grid-column: 1 / 4;
 }
 
-#tracks {
+#root > aside {
+	display: contents;
+}
+
+#root > main {
+	grid-column: 2;
+	grid-row: 2 / 4;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.sources {
 	border: 1px solid #eee;
-	width: 500px;
-	flex: 0 0 500px;
+	grid-row: 2 / 3;
+}
+
+.controls {
+	border: 1px solid #eee;
+	grid-row: 3 / 4;
+}
+
+.chat {
+	border: 1px solid #eee;
+	grid-column: 3 /4;
+	grid-row: 2 / 4;
 }
 
 #canvas {
-	border: 1px solid #eee;
-	position: relative;
-	flex: 0 0 1280px;
-	height: 720px;
+	width: 960px;
+	height: 540px;
 	overflow: hidden;
 }
+

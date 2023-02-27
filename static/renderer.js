@@ -59,7 +59,7 @@
 			if (source.type === 'track' && source.track.kind === 'video') {
 				let videoElement = videoElements.get(id);
 				const settings = source.track.getSettings();
-				ctx.drawImage(videoElement, 0, 0, settings.width, settings.height, 0, 0, settings.width, settings.height);
+				ctx.drawImage(videoElement, 0, 0, settings.width, settings.height, 0, 0, Math.min(settings.width, canvas.width), Math.min(settings.height, canvas.width));
 			}
 		}
 		requestAnimationFrame(render);
