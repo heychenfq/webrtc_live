@@ -47,7 +47,7 @@
 			let connection = connections.get(from);
 			if (data.payload.type === 'offer' && data.payload.first) {
 				connection = createConnection(from);
-				rendererNS.tracks.forEach(track => {
+				renderer.tracks.forEach(track => {
 					connection.peerConnection.addTrack(track);
 				});
 			}
@@ -112,7 +112,7 @@
 	async function waitingConnect() {
 		addSignalChannelListener();
 	}
-	globalThis.peerConnectionNS = {
+	globalThis.peerConnection = {
 		connections,
 		connect,
 		waitingConnect,

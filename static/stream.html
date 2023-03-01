@@ -25,6 +25,7 @@
 				<button id="capture-display-btn" type="button">
 					capture display or window
 				</button>
+				<button id="record" type="button">record</button>
 			</form>
 		</header>
 		<aside>
@@ -42,14 +43,15 @@
 	</div>
 </body>
 <script src="./capture.js"></script>
+<script src="./recorder.js"></script>
 <script src="./signal-channel.js"></script>
 <script src="./peer-connection.js"></script>
 <script src="./renderer.js"></script>
 <script>
 	async function main() {
-		const hasPermission = await captureNS.requestPermission();
+		const hasPermission = await capture.requestPermission();
 		if (hasPermission) {
-			peerConnectionNS.waitingConnect();
+			peerConnection.waitingConnect();
 			const audioinputSelect = document.getElementById("audioinput");
 			const videoinputSelect = document.getElementById("videoinput");
 			const captureDisplayBtn = document.getElementById(
@@ -58,19 +60,19 @@
 			audioinputSelect.addEventListener("change", (event) => {
 				const deviceId = event.currentTarget.value;
 				if (deviceId) {
-					captureNS.captureDevice(deviceId, "audioinput");
+					capture.captureDevice(deviceId, "audioinput");
 					event.currentTarget.value = "";
 				}
 			});
 			videoinputSelect.addEventListener("change", (event) => {
 				const deviceId = event.currentTarget.value;
 				if (deviceId) {
-					captureNS.captureDevice(deviceId, "videoinput");
+					capture.captureDevice(deviceId, "videoinput");
 					event.currentTarget.value = "";
 				}
 			});
 			captureDisplayBtn.addEventListener("click", () => {
-				captureNS.captureDisplay();
+				capture.captureDisplay();
 			});
 			async function autoRefreshDevices() {
 				audioinputSelect.innerHTML = "";
@@ -83,7 +85,7 @@
 				defaultAudioOutputOption.value = "";
 				defaultAudioOutputOption.innerText = "select one device";
 				videoinputSelect.appendChild(defaultAudioOutputOption);
-				const devices = await captureNS.enumerateDevices();
+				const devices = await capture.enumerateDevices();
 				devices.forEach((device) => {
 					const option = document.createElement("option");
 					option.innerText = device.label;
@@ -96,6 +98,24 @@
 				);
 			}
 			autoRefreshDevices();
+			document.getElementById('record').addEventListener('click', async (e) => {
+				const target = e.currentTarget;
+				const text = target.innerText;
+				if (text === 'record') {
+					recorder.start(new MediaStream(renderer.tracks));
+					target.innerText = 'stop record';
+				}
+				if (text === 'stop record') {
+					target.innerText = 'record';
+					const blob = await recorder.stop();					
+					const a = document.createElement('a');
+					a.href = URL.createObjectURL(blob);
+					a.download = 'test.webm';
+					a.display = 'none';
+					document.body.appendChild(a);
+					a.click();
+				}
+			});
 		}
 	}
 	main();

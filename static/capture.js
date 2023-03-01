@@ -29,21 +29,26 @@
 			},
 		});
 		mediaStream.getTracks().forEach((track) => {
-			const source = rendererNS.createSourceFromTrack({ track });
-			rendererNS.addSource(source);
+			const source = renderer.createSourceFromTrack({ track });
+			renderer.addSource(source);
 		});
 	}
 
 	async function captureDisplay() {
 		const stream = await navigator.mediaDevices.getDisplayMedia({
 			audio: true,
+			video: {
+				cursor: false,
+				restrictOwnAudio: false,
+			},
+			systemAudio: 'include', 
 		});
 		stream.getTracks().forEach((track) => {
-			const source = rendererNS.createSourceFromTrack({ track });
-			rendererNS.addSource(source);
+			const source = renderer.createSourceFromTrack({ track });
+			renderer.addSource(source);
 		});
 	}
-	globalThis.captureNS = {
+	globalThis.capture = {
 		requestPermission,
 		enumerateDevices,
 		captureDevice,

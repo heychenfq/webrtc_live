@@ -28,7 +28,7 @@
 			clear() {
 				props.track.stop();
 				if (props.track.kind === 'audio') {
-					peerConnectionNS.connections.forEach(connection => {
+					peerConnection.connections.forEach(connection => {
 						const peerConnection = connection.peerConnection;
 						const sender = peerConnection.getSenders().find(i => i.track === track);
 						peerConnection.removeTrack(sender);
@@ -40,13 +40,14 @@
 			},
 		};
 		if (props.track.kind === 'audio') {
-			peerConnectionNS.connections.forEach(connection => {
+			peerConnection.connections.forEach(connection => {
 				connection.peerConnection.addTrack(track);
 			});
 		}
 		if (props.track.kind === 'video') {
 			const videoElement = document.createElement('video');
 			videoElement.autoplay = true;
+			videoElement.style.filter = 'blur(3px)';
 			videoElement.srcObject = new MediaStream([source.track]);
 			videoElements.set(source.id, videoElement);
 		}
@@ -67,7 +68,7 @@
 
 	render();
 
-	globalThis.rendererNS = {
+	globalThis.renderer = {
 		sources,
 		get tracks() {
 			return [videoTrack, ...Array.from(sources.values()).filter(i => i.type === 'track' && i.track.kind === 'audio').map(i => i.track)];

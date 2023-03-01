@@ -17,6 +17,7 @@
 					</label>
 					<button type="submit">view live</button>
 				</form>
+				<audio src="./test_video.mp4"></audio>
 			</main>
 		</div>
 	</body>
@@ -36,7 +37,7 @@
 					const rootElement = document.getElementById("root");
 					rootElement.innerText = "";
 					rootElement.appendChild(videoElement);
-					peerConnectionNS.connect(hostID, (track) => {
+					peerConnection.connect(hostID, (track) => {
 						const mediaStream = videoElement.srcObject;
 						if (track.kind === "video") {
 							mediaStream.getVideoTracks().forEach((i) => {
